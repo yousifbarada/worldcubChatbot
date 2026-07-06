@@ -1,7 +1,6 @@
+from typing import List, Dict, Any
 
-from typing import List, Dict
-
-from llm import GeminiLLM
+from backend.llm import GeminiLLM
 
 
 class WorldCupChatbot:
@@ -9,23 +8,31 @@ class WorldCupChatbot:
     def __init__(self, retriever, llm: GeminiLLM):
         self.retriever = retriever
         self.llm = llm
-        self.history: List[Dict[str, str]] = []  # {"role": "user"|"model", "content": ...}
+        # Per-session history: session_id -> list of {"role": "user"|"model", "content": ...}
+        self.histories: Dict[str, List[Dict[str, str]]] = {}
 
-    def chat(self, question: str) -> str:
+    def chat(self, session_id: str, question: str) -> Dict[str, Any]:
+        history = self.histories.setdefault(session_id, [])
+
         results = self.retriever.retrieve(question, top_k=3)
         context = "\n\n".join([doc['content'] for doc in results]) if results else "No context found."
 
-        user_message = f"Context:\n{context}\n\nQuestion: {question}"
-
-        # Use the GeminiLLM interface instead of touching the model directly
-        response_text = self.llm.invoke(question, context)
+        response_text = self.llm.invoke(question, context, history=history)
 
         # Save this turn
-        self.history.append({"role": "user", "content": user_message})
-        self.history.append({"role": "model", "content": response_text})
+        history.append({"role": "user", "content": question})
+        history.append({"role": "model", "content": response_text})
 
-        return response_text
+        sources = [
+            {
+                "source_file": doc.get("metadata", {}).get("source_file", "unknown"),
+                "similarity_score": doc.get("similarity_score"),
+            }
+            for doc in results
+        ]
 
-    def reset(self):
-        self.history = []
-        print("Gemini LLM ready for new conversation. History cleared.")
+        return {"answer": response_text, "sources": sources}
+
+    def reset(self, session_id: str):
+        self.histories.pop(session_id, None)
+        print(f"History cleared for session {session_id}.")

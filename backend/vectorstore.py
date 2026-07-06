@@ -1,9 +1,11 @@
-import os 
-from langchain.schema import Document
+import os
+from langchain_core.documents import Document
 import chromadb
 import uuid
 from typing import List, Dict, Any, Tuple
 import numpy as np
+
+
 class VectorStore:
     def __init__(self, collection_name="pdf_documents", persist_directory="../data/vector_store"):
         self.collection_name = collection_name
@@ -20,7 +22,7 @@ class VectorStore:
                 name=self.collection_name,
                 metadata={
                     "description": "PDF document embeddings for RAG",
-                    "hnsw:space": "cosine"  # ← explicit cosine similarity
+                    "hnsw:space": "cosine"  # explicit cosine similarity
                 }
             )
             print(f"Vector store initialized. Collection: {self.collection_name}")
@@ -28,6 +30,12 @@ class VectorStore:
         except Exception as e:
             print(f"Error initializing vector store: {e}")
             raise
+
+    def count(self) -> int:
+        """Return number of documents currently stored. main.py's /api/health calls this."""
+        if not self.collection:
+            return 0
+        return self.collection.count()
 
     def add_documents(self, documents, embeddings):
         if len(documents) != len(embeddings):

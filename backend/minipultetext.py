@@ -1,8 +1,8 @@
-from langchain.schema import Document
+from langchain_core.documents import Document
 import re
 import os
 from pathlib import Path
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 def process_all_text_files(text_directory, extensions=("txt",)):
     """Load all text files recursively and wrap them as LangChain Documents."""
