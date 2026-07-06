@@ -1,0 +1,8 @@
+sentence-transformers
+chromadb
+langchain
+scikit-learn
+google-generativeai
+numpy
+pyparsing
+gitpython
