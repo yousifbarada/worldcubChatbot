@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SBS World Cup Chatbot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body>
+
+  <header class="scoreboard">
+    <div class="scoreboard__title">
+      <h1>SBS World Cup Desk</h1>
+      <span class="subtitle">Ask the archive</span>
+    </div>
+    <div class="scoreboard__status">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Checking pitch conditions…</span>
+    </div>
+  </header>
+
+  <main class="field">
+    <div class="match-feed" id="matchFeed">
+      <div class="kickoff" id="kickoff">
+        <span class="ball">⚽</span>
+        <h2>Kickoff</h2>
+        <p>Ask anything about the World Cup — finals, hosts, top scorers, upsets. Answers are pulled from the document archive, with sources shown below each reply.</p>
+        <div class="starters">
+          <button class="starter-chip" data-prompt="Who has won the most World Cup titles?">Most titles?</button>
+          <button class="starter-chip" data-prompt="Which country hosted the first World Cup?">First host nation?</button>
+          <button class="starter-chip" data-prompt="Tell me about the biggest upset in World Cup history.">Biggest upset?</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="touchline">
+      <form id="touchlineForm" class="touchline__row">
+        <textarea
+          id="messageField"
+          class="touchline__field"
+          rows="1"
+          placeholder="Ask about the World Cup…"
+          autofocus
+        ></textarea>
+        <button type="submit" class="kick-btn" id="kickBtn">Send</button>
+      </form>
+      <div class="touchline__meta">
+        <button class="new-match" id="newMatch" type="button">Start new match (clear history)</button>
+        <span class="hint">Enter to send · Shift+Enter for a new line</span>
+      </div>
+    </div>
+  </main>
+
+  <script src="/assets/script.js"></script>
+</body>
+</html>
