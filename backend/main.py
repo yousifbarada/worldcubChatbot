@@ -7,32 +7,16 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from backend.minipultetext import process_all_text_files, split_text_into_chunks
-from backend.embeddedmanger import EmbeddingManager
 from backend.llm import GeminiLLM
+from backend.embeddedmanger import EmbeddingManager
 from backend.vectorstore import VectorStore
 from backend.RAG import RAGRetriever
 from backend.worldcubchatbot import WorldCupChatbot
 
-# --- Build the RAG pipeline ---
-text_directory = "backend/text_files"
+
 v_store = VectorStore(collection_name="pdf_documents", persist_directory="data/vector_store")
 embedding_manager = EmbeddingManager()
 rag_retriever = RAGRetriever(vector_store=v_store, embedding_manager=embedding_manager)
-
-# Only ingest+embed documents the first time (collection empty), otherwise we'd
-# duplicate every chunk on every server restart.
-if v_store.count() == 0:
-    text_documents = process_all_text_files(text_directory)
-    chunks = split_text_into_chunks(text_documents, chunk_size=600, chunk_overlap=150)
-    if chunks:
-        chunk_texts = [c.page_content for c in chunks]
-        chunk_embeddings = embedding_manager.generate_embeddings(chunk_texts)
-        v_store.add_documents(chunks, chunk_embeddings)
-    else:
-        print(f"No chunks found in '{text_directory}'. The bot will have no context until documents are added.")
-else:
-    print(f"Vector store already has {v_store.count()} documents, skipping ingestion.")
 
 llm = GeminiLLM()
 chatbot = WorldCupChatbot(retriever=rag_retriever, llm=llm)
